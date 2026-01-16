@@ -20,6 +20,17 @@ namespace ConsoleApp1.LINQ
                                  on customer.PersonId equals person.Id
                                  select person.Surname + " " + person.Name + " " + customer.Id;
 
+            var MultipleJoinQuery =  from customer in context.Customers
+                                     join CustomerOrder in context.CustomerOrders
+                                     on customer.Id equals CustomerOrder.CustomerId
+                                     join person in context.People
+                                     on customer.Id equals person.Id
+                                     select person.Name + " " + person.Surname + " " + customer.Id + " Order ID: " + CustomerOrder.Id;
+
+            
+
+
+
         }
 
     }
