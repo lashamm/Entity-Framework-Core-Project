@@ -27,9 +27,29 @@ namespace ConsoleApp1.LINQ
                                      on customer.Id equals person.Id
                                      select person.Name + " " + person.Surname + " " + customer.Id + " Order ID: " + CustomerOrder.Id;
 
-            
+            var SumAndGroupByQuery = from CustomerOrder in context.CustomerOrders
+                                     join OrderDetail in context.OrderDetails
+                                     on CustomerOrder.Id equals OrderDetail.CostumerOrderId
+                                     group OrderDetail by CustomerOrder.Id into grouped
+                                     select new
+                                     {
+                                         CustomerOrderId = grouped.Key,
+                                         TotalAmount = grouped.Sum(od => od.ProductAmount),
+                                         TotalQuantity = grouped.Sum(od => od.Price),
+                                         OrderCount = grouped.Count()
+                                     };
 
+            var WherePersonIsAbove18 = from person in context.People
+                                       where DateTime.Now.Year - person.BirthDate.Value.Year > 18
+                                       select person.Name + " " + person.Surname + " Age: " + (DateTime.Now.Year - person.BirthDate.Value.Year);
 
+            var WhenPriceIsAbove800 = from product in context.Products
+                                      where product.Price > 800
+                                      select product.ProductTitleId + " Price: " + product.Price;
+
+            var OrderByProductsByPrice = from product in context.Products
+                                        orderby product.Price descending
+                                        select product.ProductTitleId + " Price: " + product.Price;
 
         }
 
