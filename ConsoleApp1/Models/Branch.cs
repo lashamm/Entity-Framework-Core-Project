@@ -40,7 +40,7 @@ public partial class Branch
     public virtual ICollection<CustomerOrder> CustomerOrders { get; set; } = new List<CustomerOrder>();
 
 
-    Branch()
+    public Branch()
     {
     }
 }

@@ -53,4 +53,8 @@ public partial class Person
     /// </summary>
     [InverseProperty("Person")]
     public virtual ICollection<Customer> Customers { get; set; } = new List<Customer>();
+
+    public Person()
+    {
+    }
 }
