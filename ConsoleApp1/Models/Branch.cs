@@ -38,4 +38,9 @@ public partial class Branch
 
     [InverseProperty("Branch")]
     public virtual ICollection<CustomerOrder> CustomerOrders { get; set; } = new List<CustomerOrder>();
+
+
+    Branch()
+    {
+    }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1.Services
 {
-    public class ProductTitleService : IOverAllServieces
+    public class OrderDetailService : IOverAllServieces
     {
         /// <summary>
         /// Represents the database context used for interacting with the ItStepProject database.
@@ -73,9 +73,8 @@ namespace ConsoleApp1.Services
             await context.FindAsync<T>(Variable);
             await context.SaveChangesAsync();
         }
-        public ProductTitleService()
+        public OrderDetailService()
         {
-
         }
     }
 }

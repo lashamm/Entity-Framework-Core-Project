@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1.Services
 {
-    internal class BranchServices : IOverAllServieces
+    public class BranchServices : IOverAllServieces
     {
         /// <summary>
         /// Represents the database context used for interacting with the ItStepProject database.
@@ -33,10 +33,14 @@ namespace ConsoleApp1.Services
         /// <returns>A delete task</returns>
         public async Task DeleteAsync<T>(int id) where T : class
         {
-            await context.FindAsync<T>(id);
+            var entity = await context.FindAsync<T>(id);
 
-            context.Remove(id);
+            if (entity == null)
+            {
+                throw new Exception($"Entity with id {id} not found");
+            }
 
+            context.Remove(entity);
             await context.SaveChangesAsync();
         }
         /// <summary>
@@ -68,6 +72,10 @@ namespace ConsoleApp1.Services
         {
             await context.FindAsync<T>(Variable);
             await context.SaveChangesAsync();
+        }
+
+        public BranchServices()
+        {
         }
     }
 }

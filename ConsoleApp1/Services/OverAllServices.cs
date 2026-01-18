@@ -19,7 +19,6 @@ namespace ConsoleApp1.Services
         /// </summary>
         /// <remarks></remarks>
         private readonly ItStepProjectContext context = new ItStepProjectContext();
-
         /// <summary>
         /// Asynchronously adds the specified entity to the database context and saves the changes.
         /// </summary>
@@ -39,10 +38,14 @@ namespace ConsoleApp1.Services
         /// <returns>A delete task</returns>
         public async Task DeleteAsync<T>(int id) where T : class
         {
-            await context.FindAsync<T>(id);
+            var entity = await context.FindAsync<T>(id);
 
-            context.Remove(id);
+            if (entity == null)
+            {
+                throw new Exception($"Entity with id {id} not found");
+            }
 
+            context.Remove(entity);
             await context.SaveChangesAsync();
         }
         /// <summary>
