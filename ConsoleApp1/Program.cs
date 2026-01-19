@@ -13,11 +13,11 @@ if (key.Key == ConsoleKey.S)
     Console.WriteLine($"Type 'BR' to edit branch" +
         $"\nType 'BD' to edit brand" +
         $"\nType 'CI' to edit city" +
-        $"\nType 'CT' to edit contact type" +  ////
+        $"\nType 'CT' to edit contact type" + 
         $"\nType 'CM' to edit customer" + 
-        $"\nType 'CO' to edit customer order" + //
+        $"\nType 'CO' to edit customer order" + 
         $"\nType 'MO' to edit model" +  
-        $"\nType 'OD' to edit order details" +     
+        //$"\nType 'OD' to edit order details" +        
         $"\nType 'PE' to edit person" +          
         $"\nType 'PC' to edit person contact" +   
         $"\nType 'PR' to edit product" +  
@@ -479,25 +479,6 @@ if (key.Key == ConsoleKey.S)
             break;
 
 
-
-
-
-
-        //case "OD":
-        //    OrderDetailService orderDetailServices = new OrderDetailService();
-        //    Console.WriteLine("Order Detail Service selected");
-        //    Console.WriteLine("Please Choose an operation:" +
-        //        "\nFor add type 'A'" +
-        //        "\nFor Delete type 'D'" +
-        //        "\nTo see 1 type 'SO'" +
-        //        "\nTyoe 'ALL' to see every contact type");
-        //    break;
-
-
-
-
-
-
         case "PC":
             PersonContactService personContactServices = new PersonContactService();
             Console.WriteLine("Person Contact Service selected");
@@ -509,8 +490,6 @@ if (key.Key == ConsoleKey.S)
             break;
 
 
-
-
         case "PR":
             ProductService productServices = new ProductService();
             Console.WriteLine("Product Service selected");
@@ -519,9 +498,51 @@ if (key.Key == ConsoleKey.S)
                 "\nFor Delete type 'D'" +
                 "\nTo see 1 type 'SO'" +
                 "\nTyoe 'ALL' to see every contact type");
+            var operationProduct = Console.ReadLine();
+            if(operationProduct.ToUpper() == "A")
+            {
+                Console.WriteLine("Enter product title id");
+                int productTitleId = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Enter product price");
+                decimal price = Convert.ToDecimal(Console.ReadLine());
+                Console.WriteLine("Enter product comment/description");
+                string comment = Console.ReadLine();
+                Console.WriteLine("Enter product brand id");
+                int brandId = Convert.ToInt32(Console.ReadLine());
+                Product product = new Product()
+                {
+                    ProductTitleId = productTitleId,
+                    Price = price,
+                    Comment = comment,
+                    BrandId = brandId
+                };
+                await productServices.AddAsync<Product>(product);
+            }
+            if(operationProduct.ToUpper() == "D")
+            {
+                Console.WriteLine("Deleting a Product");
+                Console.WriteLine("Enter Id to delete");
+                int id = Convert.ToInt32(Console.ReadLine());
+                await productServices.DeleteAsync<Product>(id);
+            }
+            if(operationProduct.ToUpper() == "SO")
+            {
+                Console.WriteLine("See 1 Product");
+                Console.WriteLine("Enter Id");
+                int id = Convert.ToInt32(Console.ReadLine());
+                var product = await productServices.GetByIdAsync<Product>(id);
+                Console.WriteLine($"Id: {product.Id} ProductTitleId: {product.ProductTitleId} Price: {product.Price} Comment: {product.Comment} BrandId: {product.BrandId}");
+            }
+            if(operationProduct.ToUpper() == "ALL")
+            {
+                Console.WriteLine("See all Products");
+                var products = await productServices.GetAllAsync<Product>();
+                foreach (var product in products)
+                {
+                    Console.WriteLine($"Id: {product.Id} ProductTitleId: {product.ProductTitleId} Price: {product.Price} Comment: {product.Comment} BrandId: {product.BrandId}");
+                }
+            }
             break;
-
-
 
 
         case "PCT":
@@ -532,10 +553,42 @@ if (key.Key == ConsoleKey.S)
                 "\nFor Delete type 'D'" +
                 "\nTo see 1 type 'SO'" +
                 "\nTyoe 'ALL' to see every contact type");
+            var operationProductCategory = Console.ReadLine();
+            if(operationProductCategory.ToUpper() == "A")
+            {
+                Console.WriteLine("Enter Product Category Name to add");
+                string name = Console.ReadLine();
+                ProductCategory productCategory = new ProductCategory()
+                {
+                    Name = name
+                };
+                await productCategoryServices.AddAsync<ProductCategory>(productCategory);
+            }
+            if(operationProductCategory.ToUpper() == "D")
+            {
+                Console.WriteLine("Deleting a Product Category");
+                Console.WriteLine("Enter Id to delete");
+                int id = Convert.ToInt32(Console.ReadLine());
+                await productCategoryServices.DeleteAsync<ProductCategory>(id);
+            }
+            if(operationProductCategory.ToUpper() == "SO")
+            {
+                Console.WriteLine("See 1 Product Category");
+                Console.WriteLine("Enter Id");
+                int id = Convert.ToInt32(Console.ReadLine());
+                var productCategory = await productCategoryServices.GetByIdAsync<ProductCategory>(id);
+                Console.WriteLine($"Id: {productCategory.Id} Name: {productCategory.Name}");
+            }
+            if(operationProductCategory.ToUpper() == "ALL")
+            {
+                Console.WriteLine("See all Product Categories");
+                var productCategories = await productCategoryServices.GetAllAsync<ProductCategory>();
+                foreach (var productCategory in productCategories)
+                {
+                    Console.WriteLine($"Id: {productCategory.Id} Name: {productCategory.Name}");
+                }
+            }
             break;
-
-
-
 
 
         case "PT":
@@ -546,6 +599,41 @@ if (key.Key == ConsoleKey.S)
                 "\nFor Delete type 'D'" +
                 "\nTo see 1 type 'SO'" +
                 "\nTyoe 'ALL' to see every contact type");
+            var operationProductTitle = Console.ReadLine();
+            if(operationProductTitle.ToUpper() == "A")
+            {
+                Console.WriteLine("Enter Product Title Name to add");
+                string name = Console.ReadLine();
+                Console.WriteLine("Enter product category id to add");
+                int productCategoryId = Convert.ToInt32(Console.ReadLine());
+                await context.ProductCategories.FindAsync(productCategoryId);
+                if(productCategoryId != context.ProductCategories.Find(productCategoryId).Id)
+                {
+                    Console.WriteLine("ProductCategoryId does not exist. Please enter a valid ProductCategoryId.");
+                    break;
+                }
+                ProductTitle productTitle = new ProductTitle()
+                {
+                    Title = name,
+                    ProductCategoryId = productCategoryId
+                };
+                await productTitleServices.AddAsync<ProductTitle>(productTitle);
+            }
+            if(operationProductTitle.ToUpper() == "D")
+            {
+                Console.WriteLine("Deleting a Product Title");
+                Console.WriteLine("Enter Id to delete");
+                int id = Convert.ToInt32(Console.ReadLine());
+                await productTitleServices.DeleteAsync<ProductTitle>(id);
+            }
+            if(operationProductTitle.ToUpper() == "SO")
+            {
+                Console.WriteLine("See 1 Product Title");
+                Console.WriteLine("Enter Id");
+                int id = Convert.ToInt32(Console.ReadLine());
+                var productTitle = await productTitleServices.GetByIdAsync<ProductTitle>(id);
+                Console.WriteLine($"Id: {productTitle.Id} Title: {productTitle.Title} ProductCategoryId: {productTitle.ProductCategoryId}");
+            }
             break;
     }
 }
@@ -553,3 +641,22 @@ else
 {
     Console.WriteLine("\nInvalid key pressed. Exiting...");
 }
+
+
+
+
+//case "OD":
+//    OrderDetailService orderDetailServices = new OrderDetailService();
+//    Console.WriteLine("Order Detail Service selected");
+//    Console.WriteLine("Please Choose an operation:" +
+//        "\nFor add type 'A'" +
+//        "\nFor Delete type 'D'" +
+//        "\nTo see 1 type 'SO'" +
+//        "\nTyoe 'ALL' to see every contact type");
+//    var operationOrderDetail = Console.ReadLine();
+//    if(operationOrderDetail.ToUpper() == "A")
+//    {
+//        Console.WriteLine("Enter Order Detail to add");
+
+//    }
+//    break;
