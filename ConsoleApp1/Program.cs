@@ -1,6 +1,7 @@
 ﻿using ConsoleApp1.Models;
 using ConsoleApp1.Services;
 using ConsoleApp1.Data;
+using Microsoft.EntityFrameworkCore;
 
 ItStepProjectContext context = new ItStepProjectContext();
 
@@ -15,7 +16,7 @@ if (key.Key == ConsoleKey.S)
         $"\nType 'CI' to edit city" +
         $"\nType 'CT' to edit contact type" + 
         $"\nType 'CM' to edit customer" + 
-        $"\nType 'CO' to edit customer order" + 
+        //$"\nType 'CO' to edit customer order" +  
         $"\nType 'MO' to edit model" +  
         //$"\nType 'OD' to edit order details" +        
         $"\nType 'PE' to edit person" +          
@@ -44,20 +45,11 @@ if (key.Key == ConsoleKey.S)
                 string lastName = Console.ReadLine();
                 Console.WriteLine("Enter Birth Date(yyyy-MM-dd)");
                 DateTime birthDate = Convert.ToDateTime(Console.ReadLine());
-                Console.WriteLine("Enter contact id");
-                int contactId = Convert.ToInt32(Console.ReadLine());
-                var contact = await context.PersonContacts.FindAsync(contactId);
-                if (contact != null)
-                {
-                    Console.WriteLine("ContactId exist. Please enter a valid ContactId.");
-                    break;
-                }
                 Person person = new Person()
                 {
                     Name = firstName,
                     Surname = lastName,
                     BirthDate = birthDate,
-                    ContactId = contactId
                 };
                 await personServices.AddAsync<Person>(person);
             }
@@ -145,19 +137,6 @@ if (key.Key == ConsoleKey.S)
             break;
 
 
-        case "CO":
-            CustomerOrderService customerOrderServices = new CustomerOrderService();
-            Console.WriteLine("Contact Type Service selected");
-            Console.WriteLine("Please Choose an operation:" +
-                "\nFor add type 'A'" +
-                "\nFor Delete type 'D'" +
-                "\nTo see 1 type 'SO'" +
-                "\nTyoe 'ALL' to see every contact type");
-            var Operation = Console.ReadLine();
-
-            break;
-
-
         case "CM":
             CustomerService customerServices = new CustomerService();
             Console.WriteLine("Customer Service selected");
@@ -175,6 +154,11 @@ if (key.Key == ConsoleKey.S)
                 if(personid == customer.Id)
                 {
                  Console.WriteLine("PersonId does not exist. Please enter a valid PersonId.");
+                    break;
+                }
+                if(await context.Customers.AnyAsync(c => c.PersonId == personid))
+                {
+                    Console.WriteLine($"A customer with Person ID {personid} already exists.");
                     break;
                 }
                 Console.WriteLine("Enter Customer's card_number(16 characters)");
@@ -487,6 +471,55 @@ if (key.Key == ConsoleKey.S)
                 "\nFor Delete type 'D'" +
                 "\nTo see 1 type 'SO'" +
                 "\nTyoe 'ALL' to see every contact type");
+            var operationPersonContact = Console.ReadLine();
+            if(operationPersonContact.ToUpper() == "A")
+            {
+                Console.WriteLine("Enter Person Id");
+                int personId = Convert.ToInt32(Console.ReadLine());
+                if(personId != context.People.Find(personId).Id)
+                {
+                    Console.WriteLine("PersonId does not exist. Please enter a valid PersonId.");
+                    break;
+                }
+                Console.WriteLine("Enter contact type id to add");
+                int contactTypeId = Convert.ToInt32(Console.ReadLine());
+                if(contactTypeId != context.ContactTypes.Find(contactTypeId).Id)
+                {
+                    Console.WriteLine("ContactTypeId does not exist. Please enter a valid ContactTypeId.");
+                    break;
+                }
+                PersonContact personContact = new PersonContact()
+                {
+                    PersonId = personId,
+                    ContactTypeId = contactTypeId
+                };
+                await personContactServices.AddAsync<PersonContact>(personContact);
+            }
+            if(operationPersonContact.ToUpper() == "D")
+            {
+                Console.WriteLine("Deleting a Person Contact");
+                Console.WriteLine("Enter Id to delete");
+                int id = Convert.ToInt32(Console.ReadLine());
+                await personContactServices.DeleteAsync<PersonContact>(id);
+            }
+            if(operationPersonContact.ToUpper() == "SO")
+            {
+                Console.WriteLine("See 1 Person Contact");
+                Console.WriteLine("Enter Id");
+                int id = Convert.ToInt32(Console.ReadLine());
+                var personContact = await personContactServices.GetByIdAsync<PersonContact>(id);
+                Console.WriteLine($"Id: {personContact.Id} PersonId: {personContact.PersonId} ContactTypeId: {personContact.ContactTypeId}");
+            }
+            if(operationPersonContact.ToUpper() == "ALL")
+            {
+                Console.WriteLine("See all Person Contacts");
+                var personContacts = await personContactServices.GetAllAsync<PersonContact>();
+                foreach (var personContact in personContacts)
+                {
+                    Console.WriteLine($"Id: {personContact.Id} PersonId: {personContact.PersonId} ContactTypeId: {personContact.ContactTypeId}");
+                }
+            }
+
             break;
 
 
@@ -634,6 +667,15 @@ if (key.Key == ConsoleKey.S)
                 var productTitle = await productTitleServices.GetByIdAsync<ProductTitle>(id);
                 Console.WriteLine($"Id: {productTitle.Id} Title: {productTitle.Title} ProductCategoryId: {productTitle.ProductCategoryId}");
             }
+            if(operationProductTitle.ToUpper() == "ALL")
+            {
+                Console.WriteLine("See all Product Titles");
+                var productTitles = await productTitleServices.GetAllAsync<ProductTitle>();
+                foreach (var productTitle in productTitles)
+                {
+                    Console.WriteLine($"Id: {productTitle.Id} Title: {productTitle.Title} ProductCategoryId: {productTitle.ProductCategoryId}");
+                }
+            }
             break;
     }
 }
@@ -659,4 +701,15 @@ else
 //        Console.WriteLine("Enter Order Detail to add");
 
 //    }
+//    break;
+//case "CO":
+//    CustomerOrderService customerOrderServices = new CustomerOrderService();
+//    Console.WriteLine("Contact Type Service selected");
+//    Console.WriteLine("Please Choose an operation:" +
+//        "\nFor add type 'A'" +
+//        "\nFor Delete type 'D'" +
+//        "\nTo see 1 type 'SO'" +
+//        "\nTyoe 'ALL' to see every contact type");
+//    var Operation = Console.ReadLine();
+
 //    break;
